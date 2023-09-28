@@ -284,11 +284,11 @@ def check_directions(centroids):
     for stab in centroid[2]:
       if centroid[0][0] > stab[1][0]:
         direction[0] = -1
-      elif centroid[0][0] > stab[1][0]:
+      elif centroid[0][0] < stab[1][0]:
         direction[0] = 1
       if centroid[0][1] > stab[1][1]:
         direction[1] = -1
-      elif centroid[0][1] > stab[1][1]:
+      elif centroid[0][1] < stab[1][1]:
         direction[1] = 1
       stab.append(direction)
   return centroids

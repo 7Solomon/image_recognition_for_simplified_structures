@@ -23,7 +23,7 @@ def main():
   images_dir = os.listdir('content/raw_images')
   #for i, element in enumerate(images_dir):
   #  print((i, element))
-  match_image = cv2.cvtColor(mask_image(cv2.imread(f'content/raw_images/{images_dir[12]}')), cv2.COLOR_GRAY2BGR)
+  match_image = cv2.cvtColor(mask_image(cv2.imread(f'content/raw_images/{images_dir[15]}')), cv2.COLOR_GRAY2BGR)
 
   gelenk_templates = generate_templates('content/templates/gelenke')
   festlager_templates = generate_templates('content/templates/festlager')
@@ -58,10 +58,22 @@ def main():
   
   print(centroids_add_directions)
   print(connection_map)
+  show_image_in_size(connection_img)
 
   System = Visualizer(centroids_add_directions,connection_map)
-  System.draw_centroids()
-  System.show()
+  System.get_size_of_system()
+  #System.show()
+
+def test_mode():
+  centroids_add_directions = [[(652.2313232421875, 1131.5631917317708), 1, [[(665.2313232421875, 1065.5631917317708), (667.2313232421875, 999.5631917317708), [0, -1]], [(718.2313232421875, 1121.5631917317708), (784.2313232421875, 1123.5631917317708), [0, -1]]], [90.0]], [(682.0310581752232, 1127.244907924107), 1, [[(748.0310581752232, 1122.244907924107), (814.0310581752232, 1124.244907924107), [0, -1]]], []], [(1042.5579659598213, 418.508553641183), 1, [[(976.5579659598213, 376.508553641183), (910.5579659598213, 376.508553641183), [-1, -1]], [(1108.5579659598213, 419.508553641183), (1174.5579659598213, 421.508553641183), [-1, -1]]], [180.0]], [(303.5849304199219, 158.00970458984375), 2, [], []], [(1975.1089274088542, 186.38629659016928), 2, [], []], [(648.8301391601562, 1481.9779663085938), 1, [], []], [(1651.353271484375, 167.8665771484375), 2, [[(1585.353271484375, 177.8665771484375), (1519.353271484375, 157.8665771484375), [-1, -1]], [(1717.353271484375, 173.8665771484375), (1783.353271484375, 167.8665771484375), [-1, -1]]], [157.94717232452695]], [(1431.3909505208333, 1169.785400390625), 1, [[(1403.3909505208333, 1103.785400390625), (1403.3909505208333, 1037.785400390625), [-1, -1]], [(1365.3909505208333, 1137.785400390625), (1299.3909505208333, 1136.785400390625), [-1, -1]]], [90.0]], [(376.30157470703125, 1456.2832438151042), 1, [], []]]
+  connection_map = [[(0, 1), (1, 0)], [(2, 1), (6, 0)]]
+
+  System = Visualizer(centroids_add_directions,connection_map)
+  System.get_size_of_system()
+  #System.show()
+
 
 if __name__ == '__main__':
-    main()
+  #test_mode()
+  
+  main()

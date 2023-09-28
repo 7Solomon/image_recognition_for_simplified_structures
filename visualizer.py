@@ -39,6 +39,50 @@ class Visualizer:
     else:
       print('Wrong, WHERE!')
 
+  def get_size_of_system(self):
+    position = [0,0]
+    max_width, max_height, min_width, min_height = 0, 0, 0, 0
+    print(self.connection_map)
+    for connection in self.connection_map:
+      print(connection)
+      old_position = position[:] 
+      position[0] = position[0] + self.centroids[connection[0][0]][2][connection[0][1]][2][0]
+      position[1] = position[1] + self.centroids[connection[0][0]][2][connection[0][1]][2][1]
+      print(f'new Position: {(position[0],position[1])}')
+      if old_position[0] > 0:
+        if position[0] > old_position[0]:
+          max_width = position[0]
+          #print(f'Max Width now {max_width}')    
+      elif old_position[0] < 0:
+        if position[0] < old_position[0]:
+          min_width = position[0]
+          #print(f'min_width now {min_width}')
+      elif old_position[0] == 0 and max_width == 0 or old_position[0] == 0 and min_width == 0:
+        if position[0] > 0:
+          max_width = position[0]
+          #print(f'max_width now {max_width}')
+        elif position[0] < 0:
+          min_width = position[0]
+          #print(f'min_width now {min_width}')
+
+      if old_position[1] > 0:
+        if position[1] > old_position[1]:
+          max_height = position[1]
+          #print(f'max_height now {max_height}')    
+      elif old_position[1] < 0:
+        if position[1] < old_position[1]:
+          min_height = position[1]
+          #print(f'min_height now {min_height}')
+      elif old_position[1] == 0 and max_height == 0 or old_position[1] == 0 and min_height == 0:
+        if position[1] > 0:
+          max_height = position[1]
+          #print(f'max_height now {max_height}')
+        elif position[1] < 0:
+          min_width = position[1]
+          #print(f'min_width now {min_width}')
+    print([(max_width,  min_width),( max_height, min_height)])
+        
+        
 
   def draw_centroid(self, anknupf_pkt, centroid):
     pts_oriantation_up = np.array([(anknupf_pkt[0], anknupf_pkt[1] - self.a), (anknupf_pkt[0] + self.a, anknupf_pkt[1] + self.a), (anknupf_pkt[0] - self.a, anknupf_pkt[1] + self.a)], np.int32)
@@ -49,8 +93,8 @@ class Visualizer:
 
   def draw_stab(self, point ,direction_vector, n):
     self.add_black_pixels_to_image(direction_vector, n)
-    print(int(self.element_length*n*direction_vector[1]))
-    cv2.line(self.output_img, (point , (point[0] + int((self.element_length/2 + self.element_length*n)*direction_vector[0]), point[1] + int(self.element_length*n*direction_vector[1]))),(255,0,0),1)
+    #print(int(self.element_length/2*n*direction_vector[1]))
+    #cv2.line(self.output_img, (point , (point[0] + int((self.element_length/2 + self.element_length*n)*direction_vector[0]), point[1] + int(self.element_length*n*direction_vector[1]))),(255,0,0),1)
 
   def draw_centroids(self):
     centroid = self.centroids[0]
