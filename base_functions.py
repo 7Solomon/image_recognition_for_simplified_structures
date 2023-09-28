@@ -24,6 +24,8 @@ def show_image_in_size(processed_img):
   display_img = cv2.resize(processed_img, (display_width, display_height))
   # Display the resized image
   cv2.imshow('Image', display_img)
+  cv2.waitKey(0)
+  #cv2.destroyAllWindows()
 
 
 def draw_points_on_image(points, image, COLOR='RED', S_Counter=0):

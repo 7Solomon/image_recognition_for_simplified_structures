@@ -50,20 +50,19 @@ def check_centroid(centroid, match_image):
     part_image = cv2.copyMakeBorder(part_image, top=0, bottom=0, left=120-part_image.shape[1], right=0, borderType=cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
 
-  #show_image_in_size(part_image)
   predictions = predict_on_data(part_image)
-  print(predictions)
   switch_label = ['gelenk','festlager', 'loslager', 'b_ecke', 'n_gelenk']
   for i, predic in enumerate(predictions[0]):
     print(f'Es ist mit  {predic*100} %  --> {switch_label[i]}')
-
-  if max(predictions[0]) > 0.5:
+  #show_image_in_size(part_image)
+  
+  if max(predictions[0]) > 0.8:
     idx = np.argmax(predictions[0])
-    if centroid[1] == idx:   # -1 wegen shceiß ipynb.checkpoint
+    if centroid[1] == idx:   
       print(f'{ centroid[1], idx}: Found Correkt save_file')
     else:
       print(f'{ centroid[1], idx}: Found NOT Correkt')
-      centroid[1] = [idx]
+      centroid[1] = idx
     return centroid
   else:
     print('No element Found')
@@ -153,7 +152,7 @@ def check_staebe(staebe_centroids):
 
 def add_label(centroids, label):
   for i, centroid in enumerate(centroids):
-    centroids[i] = (centroid, label)
+    centroids[i] = [centroid, label]
   return centroids
 
 
@@ -257,6 +256,7 @@ def connect_centroids(centroids, match_image):
   centroid_staebe_store_List = []
   for centroid in centroids:
     centroid_staebe_store_List.append(centroid[2])
+    #print(centroid[2])
   for i in range(len(centroid_staebe_store_List)):
     for j in range(len(centroid_staebe_store_List)):
       if i != j : #and len(centroid_staebe_store_List[i]) and len(centroid_staebe_store_List[j])
@@ -280,15 +280,15 @@ def connect_centroids(centroids, match_image):
 
 def check_directions(centroids):
   for centroid in centroids:
-    direction = (0,0)
+    direction = [0,0]
     for stab in centroid[2]:
-      if centroid[0][0] > stab[0]:
+      if centroid[0][0] > stab[1][0]:
         direction[0] = -1
-      elif centroid[0][0] > stab[0]:
+      elif centroid[0][0] > stab[1][0]:
         direction[0] = 1
-      if centroid[0][1] > stab[1]:
+      if centroid[0][1] > stab[1][1]:
         direction[1] = -1
-      elif centroid[0][1] > stab[1]:
+      elif centroid[0][1] > stab[1][1]:
         direction[1] = 1
-      centroid.append(direction)
+      stab.append(direction)
   return centroids
