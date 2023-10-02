@@ -1,5 +1,4 @@
-from centroid_detection import local_template_matching
-from centroid_detection import dbscan_clustering
+from centroid_detection import local_template_matching_SIFT
 from centroid_detection import dbscan_clustering
 from centroid_detection import sort_for_center_points
 
@@ -70,11 +69,21 @@ def check_centroid(centroid, match_image):
 
 def add_all_centroids(array, match_image):
   all_centroids_array = []
-  for centroids in array:
+  double = False
+  for i, centroids in enumerate(array):
     for centroid in centroids:
-      centroid = check_centroid(centroid, match_image)
-      if centroid != None:
-        all_centroids_array.append(centroid)
+      if len(all_centroids_array) > 0:
+        for controll_centroid in all_centroids_array:
+          if is_in_range(controll_centroid[0], centroid[0]):
+            double = True
+        if not double:
+          new_centroid = check_centroid(centroid, match_image)
+          if new_centroid != None:
+            all_centroids_array.append(centroid)
+      else:
+        new_centroid = check_centroid(centroid, match_image)
+        if new_centroid != None:
+          all_centroids_array.append(new_centroid)
   return all_centroids_array
 
 
@@ -91,7 +100,7 @@ def get_obj(template_imgs, match_image, MODE=None):
   centroids_of_all_templates = []
 
   for template_img in template_imgs:
-    matched_points, matched_image = local_template_matching(template_img, match_image)
+    matched_points, matched_image = local_template_matching_SIFT(template_img, match_image)
     #show_image_in_size(matched_image)
     cluster_pts, cluster_label, cluster_img = dbscan_clustering(matched_points, match_image, MODE=MODE)
     #show_image_in_size(cluster_img)

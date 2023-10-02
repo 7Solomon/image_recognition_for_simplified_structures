@@ -38,7 +38,31 @@ def sort_for_center_points(points, labels, image_to_overlay):
 
   return centroids, output_img
 
-def local_template_matching(template_image, match_image):
+
+def local_template_matching_superpoint(template_image, match_image):
+  superpoint = cv2.SuperPoint_create()
+  template_kp, template_des = superpoint.detectAndCompute(template_image, None)
+  match_kp, match_des = superpoint.detectAndCompute(match_image, None)
+  bf = cv2.BFMatcher()
+
+  matches = bf.knnMatch(template_des, match_des, k=2)
+# Apply ratio test
+  good_matches = []
+  for m, n in matches:
+    if m.distance < 0.75 * n.distance:
+      good_matches.append(m)
+
+    # Draw the matches
+  matching_result_img = cv2.drawMatches(template_image, template_kp, match_image, match_kp, good_matches, None)
+
+    # Extract keypoints that were matched
+  matched_kp = [match_kp[m.trainIdx] for m in good_matches]
+  matched_pts = np.float32([kp.pt for kp in matched_kp]).reshape(-1, 2)
+
+  return matched_pts, matching_result_img
+
+
+def local_template_matching_SIFT(template_image, match_image):
   SIFT = cv2.SIFT_create()
   kp1, des1 = SIFT.detectAndCompute(template_image, None)
   kp2, des2 = SIFT.detectAndCompute(match_image, None)
