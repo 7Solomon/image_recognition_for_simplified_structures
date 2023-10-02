@@ -70,16 +70,18 @@ def check_centroid(centroid, match_image):
 def add_all_centroids(array, match_image):
   all_centroids_array = []
   double = False
-  for i, centroids in enumerate(array):
+  for centroids in array:
     for centroid in centroids:
       if len(all_centroids_array) > 0:
         for controll_centroid in all_centroids_array:
           if is_in_range(controll_centroid[0], centroid[0]):
+            print(f'{(controll_centroid[0], centroid[0])}: are close, so was {centroid[0]} not added')
             double = True
         if not double:
           new_centroid = check_centroid(centroid, match_image)
           if new_centroid != None:
             all_centroids_array.append(centroid)
+        double = False
       else:
         new_centroid = check_centroid(centroid, match_image)
         if new_centroid != None:

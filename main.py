@@ -56,9 +56,7 @@ def main():
 
   connection_map, connection_img = connect_centroids(centroids_add_directions, match_image)
   
-  print(centroids_add_directions)
-  print(connection_map)
-  show_image_in_size(connection_img)
+  show_image_in_size(centroid_image)
 
   System = Visualizer(centroids_add_directions,connection_map)
   System.get_size_of_system()
