@@ -15,7 +15,7 @@ class ImageViewer(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Image Viewer')
+        self.setWindowTitle('Image Labeln')
         self.setGeometry(0, 0, 2000, 1000)  # Set a fixed window size
 
         central_widget = QWidget(self)

@@ -121,6 +121,11 @@ def create_image_from_borders(up, down, left, right):
   return image
 
 def kondense_border_max_array_to_value(max_array):
+  #for i, idx in enumerate(max_array):
+  #  if i < len(max_array):
+  #    if idx == max_array[i+1] + 1:
+
+
   # Muss noch geaded wer, dass wenn zwei linien am Rand sind, dass dann geclustert wird oder so
   return [int(np.median(max_array))]
 
@@ -133,4 +138,8 @@ def get_max_array(array):
   if len(max_indices) > 1:
     max_indices = kondense_border_max_array_to_value(max_indices)
   return max_indices
+
+def custom_sort(filename):
+  return int(filename.split('.')[0])
+
 

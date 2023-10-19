@@ -11,13 +11,18 @@ from base_functions import draw_points_on_image
 from base_functions import is_in_range
 from base_functions import check_image_in_part
 from base_functions import show_image_in_size
-
+from base_functions import custom_sort
 
 from object_classification import predict_on_data
+
+from better_overview_GUI.GUI import ImageViewer
 
 import os
 import cv2
 import numpy as np
+
+import sys
+from PyQt5.QtWidgets import QApplication
 
 def compound_images(images):
   composite_image = images[0].copy()  # Make a copy to preserve the original
@@ -47,24 +52,33 @@ def check_centroid(centroid, match_image):
     part_image = cv2.copyMakeBorder(part_image, top=0, bottom=120-part_image.shape[0], left=0, right=0, borderType=cv2.BORDER_CONSTANT, value=(0, 0, 0))
   if part_image.shape[1] != 120:
     part_image = cv2.copyMakeBorder(part_image, top=0, bottom=0, left=120-part_image.shape[1], right=0, borderType=cv2.BORDER_CONSTANT, value=(0, 0, 0))
-
+  
+  # For Download
+  directory = os.listdir('label_programm/test_folder')
+  if len(directory) > 0:
+    length = int(sorted(directory, key=custom_sort)[-1].split('.')[0]) + 1
+    print(length)
+  else:
+    length = 0
+  cv2.imwrite(f'label_programm/test_folder/{length}.png', part_image)
 
   predictions = predict_on_data(part_image)
   switch_label = ['gelenk','festlager', 'loslager', 'b_ecke', 'n_gelenk']
-  for i, predic in enumerate(predictions[0]):
-    print(f'Es ist mit  {predic*100} %  --> {switch_label[i]}')
+  #for i, predic in enumerate(predictions[0]):
+  #  print(f'Es ist mit  {predic*100} %  --> {switch_label[i]}')
   #show_image_in_size(part_image)
   
   if max(predictions[0]) > 0.8:
     idx = np.argmax(predictions[0])
-    if centroid[1] == idx:   
-      print(f'{ centroid[1], idx}: Found Correkt save_file')
+    if centroid[1] == idx:  
+      pass
+      #print(f'{ centroid[1], idx}: Found Correkt save_file')
     else:
-      print(f'{ centroid[1], idx}: Found NOT Correkt')
+      #print(f'{ centroid[1], idx}: Found NOT Correkt')
       centroid[1] = idx
     return centroid
   else:
-    print('No element Found')
+    #print('No element Found')
     return None
 
 def add_all_centroids(array, match_image):
@@ -303,3 +317,15 @@ def check_directions(centroids):
         direction[1] = 1
       stab.append(direction)
   return centroids
+
+def display_GUI(centroids, match_image):
+  app = QApplication(sys.argv)
+  GUI = ImageViewer()
+  image_with_label_array = []
+  for centroid in centroids:
+    img = check_image_in_part(match_image, centroid[0])
+    label = centroid[1]
+    image_with_label_array.append((img, label))
+  GUI.render_images(image_with_label_array)
+  GUI.show()
+  

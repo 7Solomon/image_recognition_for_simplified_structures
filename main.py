@@ -14,18 +14,21 @@ from functions import draw_centroids_on_image
 from functions import compound_images
 
 from visualizer import Visualizer
+from functions import display_GUI
+
+from better_overview_GUI.GUI_2 import ImageViewer
 
 import os
 import cv2
+import sys
+from PyQt5.QtWidgets import QApplication
 
 
-def main():
-  images_dir = os.listdir('content/raw_images')
-  templates_dir = os.listdir('content/templates/')
-  match_image = cv2.cvtColor(mask_image(cv2.imread(f'content/raw_images/{images_dir[14]}')), cv2.COLOR_GRAY2BGR)
+def main(match_image):
+  
 
-  for i, element in enumerate(images_dir):
-    print((i, element))
+  #for i, element in enumerate(images_dir):
+  #  print((i, element))
 
   templates, centroids_array = [], []
   
@@ -55,11 +58,23 @@ def main():
 
   connection_map, connection_img = connect_centroids(centroids_add_directions, match_image)
   
-  show_image_in_size(centroid_image)
-  show_image_in_size(staebe_img)
+  #app = QApplication(sys.argv)
+  #viewer = ImageViewer(centroids, match_image_url)
+  #viewer.load_images([centroid_image,staebe_img])
+  #viewer.load_centroids()
+  #viewer.show()
+  
+  #sys.exit(app.exec_())
 
-  System = Visualizer(centroids_add_directions,connection_map)
-  System.get_size_of_system()
+
+  #display_GUI(centroids_add_directions, match_image)
+
+  #show_image_in_size(centroid_image)
+  #show_image_in_size(staebe_img)
+
+
+  #System = Visualizer(centroids_add_directions,connection_map)
+  #System.get_size_of_system()
   #System.show()
 
 def test_mode():
@@ -73,5 +88,11 @@ def test_mode():
 
 if __name__ == '__main__':
   #test_mode()
-  
-  main()
+  images_dir = sorted(os.listdir('content/raw_images'))
+  templates_dir = os.listdir('content/templates/')
+  for image in images_dir[:2]:
+    match_image_url = f'content/raw_images/{image}'
+    #match_image = cv2.cvtColor(mask_image(cv2.imread(match_image_url)), cv2.COLOR_GRAY2BGR)
+    match_image = cv2.imread(match_image_url)
+
+    main(match_image)

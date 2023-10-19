@@ -57,7 +57,7 @@ class Visualizer:
         if position[0] < old_position[0]:
           min_width = position[0]
           #print(f'min_width now {min_width}')
-      elif old_position[0] == 0 and max_width == 0 or old_position[0] == 0 and min_width == 0:
+      elif old_position[0] == 0 and max_width == 0 and min_width == 0 or old_position[0] == 0 and max_width == 0 and min_width == 0:
         if position[0] > 0:
           max_width = position[0]
           #print(f'max_width now {max_width}')
@@ -73,7 +73,7 @@ class Visualizer:
         if position[1] < old_position[1]:
           min_height = position[1]
           #print(f'min_height now {min_height}')
-      elif old_position[1] == 0 and max_height == 0 or old_position[1] == 0 and min_height == 0:
+      elif old_position[1] == 0 and max_width == 0 and min_width == 0 or old_position[1] == 0 and max_width == 0 and min_width == 0:
         if position[1] > 0:
           max_height = position[1]
           #print(f'max_height now {max_height}')
