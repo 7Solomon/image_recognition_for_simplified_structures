@@ -18,7 +18,8 @@ class Labeler(QMainWindow):
         self.init_var()
         self.initUI()
     def init_var(self):
-        self.list_of_images = sorted(os.listdir('test_folder'), key=custom_sort) 
+        self.test_folder_URL = '/home/johannes/Dokumente/programme/image_analyses_v2/label_programm/test_folder'
+        self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=custom_sort) 
     def initUI(self):
         self.setWindowTitle('Label machen ist toll')
 
@@ -62,66 +63,80 @@ class Labeler(QMainWindow):
         layout.addWidget(button_container)
         
     def button_clicked(self, number_label):
-        self.list_of_images = sorted(os.listdir('test_folder'))
+        self.list_of_images = sorted(os.listdir(self.test_folder_URL))
         current_pixmap = self.label.pixmap()
         if not current_pixmap.isNull():
-            dir_string = 'test_label' 
+            dir_string = '/home/johannes/Dokumente/programme/image_analyses_v2/label_programm/test_label' 
             image = current_pixmap.toImage()
-            print(int(sorted(os.listdir(f'{dir_string}/0_gelenk'))[-1].split('.')[0])+1)
             match number_label:
                 case 0:
-                    biggest_number = str(int(sorted(os.listdir(f"{dir_string}/0_gelenk"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/0_gelenk")) < 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/0_gelenk"))[-1].split('.')[0]) + 1)
+                    else:
+                        biggest_number = str(0)
                     image.save(f'{dir_string}/0_gelenk/{biggest_number}.png')
-                    if os.path.exists(f'test_folder/{self.name_of_image}'):
-                        os.remove(f'test_folder/{self.name_of_image}')
+                    if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+                        os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
                     else:
                         print(' no file ith that, name to delete')
                 case 1:
-                    biggest_number = str(int(sorted(os.listdir(f"{dir_string}/1_festlager"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/1_festlager")) < 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/1_festlager"))[-1].split('.')[0]) + 1)
+                    else:
+                        biggest_number = str(0)
                     image.save(f'{dir_string}/1_festlager/{biggest_number}.png')
-                    if os.path.exists(f'test_folder/{self.name_of_image}'):
-                        os.remove(f'test_folder/{self.name_of_image}')
+                    if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+                        os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
                     else:
                         print(' no file ith that, name to delete')
                 case 2:
-                    biggest_number = str(int(sorted(os.listdir(f"{dir_string}/2_loslager"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/2_loslager")) < 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/2_loslager"))[-1].split('.')[0]) + 1)
+                    else:
+                        biggest_number = str(0)
                     image.save(f'{dir_string}/2_loslager/{biggest_number}.png')
-                    if os.path.exists(f'test_folder/{self.name_of_image}'):
-                        os.remove(f'test_folder/{self.name_of_image}')
+                    if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+                        os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
                     else:
                         print(' no file ith that, name to delete')
                 case 3:
-                    biggest_number = str(int(sorted(os.listdir(f"{dir_string}/3_biegesteife_ecke"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/3_biegesteife_ecke")) < 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/3_biegesteife_ecke"))[-1].split('.')[0]) + 1)
+                    else:
+                        biggest_number = str(0)
                     image.save(f'{dir_string}/3_biegesteife_ecke/{biggest_number}.png')
-                    if os.path.exists(f'test_folder/{self.name_of_image}'):
-                        os.remove(f'test_folder/{self.name_of_image}')
+                    if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+                        os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
                     else:
                         print(' no file ith that, name to delete')
                 case 4:
-                    biggest_number = str(int(sorted(os.listdir(f"{dir_string}/4_normalkraft_gelenk"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/4_normalkraft_gelenk")) < 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/4_normalkraft_gelenk"))[-1].split('.')[0]) + 1)
+                    else:
+                        biggest_number = str(0)
                     image.save(f'{dir_string}/4_normalkraft_gelenk/{biggest_number}.png')
-                    if os.path.exists(f'test_folder/{self.name_of_image}'):
-                        os.remove(f'test_folder/{self.name_of_image}')
+                    if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+                        os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
                     else:
                         print(' no file ith that, name to delete')
                 case _:
                     print('Unknown Label')
-            self.list_of_images = sorted(os.listdir('test_folder'))
+            self.list_of_images = sorted(os.listdir(self.test_folder_URL))
             self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
             self.name_of_image = self.list_of_images[0]
 
     def delete_image(self):
-        if os.path.exists(f'test_folder/{self.name_of_image}'):
-            os.remove(f'test_folder/{self.name_of_image}')
-            self.list_of_images = sorted(os.listdir('test_folder'))
+        if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
+            os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
+            self.list_of_images = sorted(os.listdir(self.test_folder_URL))
             self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
             self.name_of_image = self.list_of_images[0]
         else:
             print(f' no file with {self.name_of_image}, as name to delete')
     
     def load_pixmap_from_url(self,URL):
-        image = self.load_cv2_image(cv2.imread(f'test_folder/{URL}'))
-        print(f'{image} from: {URL}')
+        image = self.load_cv2_image(cv2.imread(f'{self.test_folder_URL}/{URL}'))
+        #print(f'{image} from: {URL}')
         return image
 
     def load_cv2_image(self,cv_image):

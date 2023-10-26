@@ -20,6 +20,8 @@ from better_overview_GUI.GUI import ImageViewer
 import os
 import cv2
 import numpy as np
+import random
+import shutil
 
 import sys
 from PyQt5.QtWidgets import QApplication
@@ -44,7 +46,7 @@ def draw_centroids_on_image(centroids, img):
   return output_image
 
 
-def check_centroid(centroid, match_image):
+def check_centroid(centroid, match_image, DOWNLOAD=False):
   output_image = match_image.copy()
   part_image = check_image_in_part(output_image, centroid[0])
   # Adde schwarze pixels das input shape stimmt
@@ -57,31 +59,31 @@ def check_centroid(centroid, match_image):
   directory = os.listdir('label_programm/test_folder')
   if len(directory) > 0:
     length = int(sorted(directory, key=custom_sort)[-1].split('.')[0]) + 1
-    print(length)
   else:
     length = 0
-  cv2.imwrite(f'label_programm/test_folder/{length}.png', part_image)
+
+  if DOWNLOAD:
+    cv2.imwrite(f'label_programm/test_folder/{length}.png', part_image)
 
   predictions = predict_on_data(part_image)
   switch_label = ['gelenk','festlager', 'loslager', 'b_ecke', 'n_gelenk']
   #for i, predic in enumerate(predictions[0]):
   #  print(f'Es ist mit  {predic*100} %  --> {switch_label[i]}')
-  #show_image_in_size(part_image)
   
-  if max(predictions[0]) > 0.8:
+  if max(predictions[0]) > 0.3:
     idx = np.argmax(predictions[0])
     if centroid[1] == idx:  
-      pass
-      #print(f'{ centroid[1], idx}: Found Correkt save_file')
+      centroid[1] = [centroid[1], predictions[0]]
     else:
       #print(f'{ centroid[1], idx}: Found NOT Correkt')
-      centroid[1] = idx
+      centroid[1] = [idx,predictions[0]]
     return centroid
   else:
     #print('No element Found')
     return None
 
-def add_all_centroids(array, match_image):
+
+def add_all_centroids(array, match_image, DOWNLOAD=False):
   all_centroids_array = []
   double = False
   for centroids in array:
@@ -92,7 +94,7 @@ def add_all_centroids(array, match_image):
             print(f'{(controll_centroid[0], centroid[0])}: are close, so was {centroid[0]} not added')
             double = True
         if not double:
-          new_centroid = check_centroid(centroid, match_image)
+          new_centroid = check_centroid(centroid, match_image, DOWNLOAD=DOWNLOAD)
           if new_centroid != None:
             all_centroids_array.append(centroid)
         double = False
@@ -329,3 +331,62 @@ def display_GUI(centroids, match_image):
   GUI.render_images(image_with_label_array)
   GUI.show()
   
+
+def sort_folder_for_data_pipeline():
+  destination_path = 'test_1'
+
+  path_to_folders = ['label_programm/test_label']
+  gelenke, festlager, loslager, biegesteife_ecke, normalkraft_gelenk = [], [], [], [], []
+  hirarchy = [gelenke, festlager, loslager, biegesteife_ecke, normalkraft_gelenk]
+
+  for path in path_to_folders:
+    print(sorted(os.listdir(path)))
+    for i, label_path in enumerate(sorted(os.listdir(path))):
+      for image_path in sorted(os.listdir(f'{path}/{label_path}')):
+        #print(f'{path}/{label_path}/{image_path}')
+        #if f'{path}/{label_path}/{image_path}' in hirarchy[i]:
+        #  print('Stomething aint right')
+        hirarchy[i].append(f'{path}/{label_path}/{image_path}')
+  
+
+  if not os.path.exists(destination_path):
+    print(f'Path did not Exist I created one fore you, you little yapa: {destination_path}')
+    os.mkdir(destination_path)
+  if not os.path.exists(f'{destination_path}/train'):
+    os.mkdir(f'{destination_path}/train')
+  if not os.path.exists(f'{destination_path}/validation'):
+    os.mkdir(f'{destination_path}/validation')
+
+  for i, element in enumerate(hirarchy):
+    random.shuffle(element)
+    for i, image in enumerate(element[:int(len(element)//2)]):
+      label_name = image.split('/')[-2]
+      img_name =  image.split('/')[3]
+
+      if not os.path.exists(f'{destination_path}/train/{label_name}'):   #nICHT OPTIMAL
+        os.mkdir(f'{destination_path}/train/{label_name}')
+
+      shutil.copy(image, f'{destination_path}/train/{label_name}/{i}.jpg')
+    
+    for i, image in enumerate(element[int(len(element)//2):]):
+      label_name = image.split('/')[-2]
+      img_name =  image.split('/')[3]
+
+      if not os.path.exists(f'{destination_path}/validation/{label_name}'):   #nICHT OPTIMAL
+        os.mkdir(f'{destination_path}/validation/{label_name}')
+
+      shutil.copy(image, f'{destination_path}/validation/{label_name}/{i}.jpg')
+    
+    print(f'{i}: hat {len(element)} Elemente')
+      
+def handle_main_for_GUI(match_image):
+  image_1, image_2 = main(match_image)
+  return image_1, image_2
+
+
+def save_all_part_image_with_percentage(centroids, match_image):
+  array = []
+  for centroid in centroids:
+    part_image = check_image_in_part(match_image,centroid[0])
+    array.append([part_image, centroid[1]])
+  return array

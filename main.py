@@ -12,11 +12,14 @@ from functions import connect_centroids
 from functions import download_raw_part_images
 from functions import draw_centroids_on_image
 from functions import compound_images
-
-from visualizer import Visualizer
-from functions import display_GUI
+from functions import sort_folder_for_data_pipeline
+from functions import handle_main_for_GUI
+from functions import save_all_part_image_with_percentage
 
 from better_overview_GUI.GUI_2 import ImageViewer
+from visualize.GUI_for_main import GUI
+
+from object_classification import train_modell
 
 import os
 import cv2
@@ -24,15 +27,15 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 
-def main(match_image):
+def main(match_image, DOWNLOAD= False):
   
 
   #for i, element in enumerate(images_dir):
   #  print((i, element))
 
+  templates_dir = os.listdir('content/templates/')
   templates, centroids_array = [], []
   
-
   for template_dir in templates_dir:
     templates.append(generate_templates(f'content/templates/{template_dir}'))
   for template in templates:
@@ -47,17 +50,17 @@ def main(match_image):
   #staebe_of_loslager, staebe_of_loslager_img = custome_line_detection(loslager_centroids, match_image)
   #staebe_of_biegesteife_ecke, staebe_of_biegesteife_ecke_img = custome_line_detection(biegesteife_ecke_centroids, match_image)
 
-  centroids = add_all_centroids(centroids_array, match_image)
+  centroids = add_all_centroids(centroids_array, match_image, DOWNLOAD=DOWNLOAD)
   centroid_image = draw_centroids_on_image(centroids, match_image)
+  part_image_and_percentage = save_all_part_image_with_percentage(centroids, match_image)
 
-  #download_raw_part_images(centroids, match_image, images_dir[11])
+  centroids, staebe_img = custome_line_detection(centroids, match_image)
+  centroids = check_staebe(centroids)
+  centroids = check_directions(centroids)
 
-  centroids_add_staebe, staebe_img = custome_line_detection(centroids, match_image)
-  centroids_add_angles = check_staebe(centroids_add_staebe)
-  centroids_add_directions = check_directions(centroids_add_angles)
 
-  connection_map, connection_img = connect_centroids(centroids_add_directions, match_image)
-  
+  connection_map, connection_img = connect_centroids(centroids, match_image)
+  return centroid_image, connection_img, centroids, part_image_and_percentage
   #app = QApplication(sys.argv)
   #viewer = ImageViewer(centroids, match_image_url)
   #viewer.load_images([centroid_image,staebe_img])
@@ -86,13 +89,33 @@ def test_mode():
   #System.show()
 
 
-if __name__ == '__main__':
-  #test_mode()
+def download_all_part_images():
   images_dir = sorted(os.listdir('content/raw_images'))
-  templates_dir = os.listdir('content/templates/')
-  for image in images_dir[:2]:
+  for image in images_dir:
     match_image_url = f'content/raw_images/{image}'
     #match_image = cv2.cvtColor(mask_image(cv2.imread(match_image_url)), cv2.COLOR_GRAY2BGR)
     match_image = cv2.imread(match_image_url)
+    main(match_image,DOWNLOAD=True)
 
-    main(match_image)
+
+def open_GUI():
+  images_dir = sorted(os.listdir('content/raw_images'))
+  match_image_url = f'content/raw_images/{images_dir[0]}'
+  match_image = cv2.imread(match_image_url)
+
+  app = QApplication(sys.argv)
+  viewer = GUI(match_image)
+  
+  viewer.create_and_connect_button(sort_folder_for_data_pipeline, 'Create Folder for DataPipeLine')
+  viewer.create_and_connect_button(download_all_part_images, 'Download all part Images to label Programm')
+  viewer.create_and_connect_button(lambda: viewer.connect_main(main), 'Get Centroids')
+  viewer.create_and_connect_button(viewer.open_labler, 'Open Labler')
+  viewer.create_and_connect_button(train_modell, 'Train part Image')
+  
+  
+
+  viewer.show()
+  sys.exit(app.exec_())
+if __name__ == '__main__':
+  open_GUI()
+  

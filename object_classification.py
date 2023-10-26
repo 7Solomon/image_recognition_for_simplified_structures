@@ -65,7 +65,7 @@ def train_modell():
   model = define_neural_net(image_height, image_width, len(train_generator.class_indices))
 
   history = model.fit(train_generator, epochs=num_epochs, validation_data=validation_generator, )
-  model.save('content/models/model_4.h5')
+  model.save('content/models/model_5.h5')
   print('---------- model_4 --------')
   print("Training accuracy:", history.history['accuracy'])
   print("Validation accuracy:", history.history['val_accuracy'])
@@ -75,7 +75,7 @@ def train_modell():
 
 
 def predict_on_data(img):
-  loaded_model = load_model('content/models/model_4.h5')
+  loaded_model = load_model('content/models/model_5.h5')
   img = img / 255.0       # Normalize
   img = np.expand_dims(img, axis=0)    # Add a batch dimension to the input image
   predictions = loaded_model.predict(img)
