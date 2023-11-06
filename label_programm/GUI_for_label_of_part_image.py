@@ -19,7 +19,7 @@ class Labeler(QMainWindow):
         self.initUI()
     def init_var(self):
         self.test_folder_URL = '/home/johannes/Dokumente/programme/image_analyses_v2/label_programm/test_folder'
-        self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=custom_sort) 
+        self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=lambda x: int(x.split('.')[0])) 
     def initUI(self):
         self.setWindowTitle('Label machen ist toll')
 
@@ -33,9 +33,11 @@ class Labeler(QMainWindow):
     def initLabler(self):
         layout = QHBoxLayout(self.central_widget)
         self.label = QLabel()
-        # Set first Imaagee
-        self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
-        self.name_of_image = self.list_of_images[0]
+        if len(self.list_of_images) > 0:
+            self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
+            self.name_of_image = self.list_of_images[0]
+        else:
+            print('Lisst out of Range')
 
         
 
@@ -63,15 +65,15 @@ class Labeler(QMainWindow):
         layout.addWidget(button_container)
         
     def button_clicked(self, number_label):
-        self.list_of_images = sorted(os.listdir(self.test_folder_URL))
+        self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=lambda x: int(x.split('.')[0]))
         current_pixmap = self.label.pixmap()
         if not current_pixmap.isNull():
             dir_string = '/home/johannes/Dokumente/programme/image_analyses_v2/label_programm/test_label' 
             image = current_pixmap.toImage()
             match number_label:
                 case 0:
-                    if len(os.listdir(f"{dir_string}/0_gelenk")) < 0:
-                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/0_gelenk"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/0_gelenk")) > 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/0_gelenk"), key=lambda x: int(x.split('.')[0]))[-1].split('.')[0]) + 1)
                     else:
                         biggest_number = str(0)
                     image.save(f'{dir_string}/0_gelenk/{biggest_number}.png')
@@ -80,8 +82,8 @@ class Labeler(QMainWindow):
                     else:
                         print(' no file ith that, name to delete')
                 case 1:
-                    if len(os.listdir(f"{dir_string}/1_festlager")) < 0:
-                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/1_festlager"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/1_festlager")) > 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/1_festlager"), key=lambda x: int(x.split('.')[0]))[-1].split('.')[0]) + 1) 
                     else:
                         biggest_number = str(0)
                     image.save(f'{dir_string}/1_festlager/{biggest_number}.png')
@@ -90,8 +92,8 @@ class Labeler(QMainWindow):
                     else:
                         print(' no file ith that, name to delete')
                 case 2:
-                    if len(os.listdir(f"{dir_string}/2_loslager")) < 0:
-                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/2_loslager"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/2_loslager")) > 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/2_loslager"), key=lambda x: int(x.split('.')[0]))[-1].split('.')[0]) + 1)
                     else:
                         biggest_number = str(0)
                     image.save(f'{dir_string}/2_loslager/{biggest_number}.png')
@@ -100,8 +102,8 @@ class Labeler(QMainWindow):
                     else:
                         print(' no file ith that, name to delete')
                 case 3:
-                    if len(os.listdir(f"{dir_string}/3_biegesteife_ecke")) < 0:
-                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/3_biegesteife_ecke"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/3_biegesteife_ecke")) > 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/3_biegesteife_ecke"), key=lambda x: int(x.split('.')[0]))[-1].split('.')[0]) + 1)
                     else:
                         biggest_number = str(0)
                     image.save(f'{dir_string}/3_biegesteife_ecke/{biggest_number}.png')
@@ -110,8 +112,8 @@ class Labeler(QMainWindow):
                     else:
                         print(' no file ith that, name to delete')
                 case 4:
-                    if len(os.listdir(f"{dir_string}/4_normalkraft_gelenk")) < 0:
-                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/4_normalkraft_gelenk"))[-1].split('.')[0]) + 1)
+                    if len(os.listdir(f"{dir_string}/4_normalkraft_gelenk")) > 0:
+                        biggest_number = str(int(sorted(os.listdir(f"{dir_string}/4_normalkraft_gelenk"), key=lambda x: int(x.split('.')[0]))[-1].split('.')[0]) + 1)
                     else:
                         biggest_number = str(0)
                     image.save(f'{dir_string}/4_normalkraft_gelenk/{biggest_number}.png')
@@ -121,16 +123,21 @@ class Labeler(QMainWindow):
                         print(' no file ith that, name to delete')
                 case _:
                     print('Unknown Label')
-            self.list_of_images = sorted(os.listdir(self.test_folder_URL))
-            self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
-            self.name_of_image = self.list_of_images[0]
+            self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=lambda x: int(x.split('.')[0]))
+            if len(self.list_of_images) > 0:
+                self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
+                self.name_of_image = self.list_of_images[0]
+                print(self.name_of_image)
+            else:
+                print('list Empty')
 
     def delete_image(self):
         if os.path.exists(f'{self.test_folder_URL}/{self.name_of_image}'):
             os.remove(f'{self.test_folder_URL}/{self.name_of_image}')
-            self.list_of_images = sorted(os.listdir(self.test_folder_URL))
+            self.list_of_images = sorted(os.listdir(self.test_folder_URL), key=lambda x: int(x.split('.')[0]))
             self.label.setPixmap(self.load_pixmap_from_url(self.list_of_images[0]))
             self.name_of_image = self.list_of_images[0]
+            print(self.name_of_image)
         else:
             print(f' no file with {self.name_of_image}, as name to delete')
     

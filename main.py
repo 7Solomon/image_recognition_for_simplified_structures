@@ -18,6 +18,7 @@ from functions import save_all_part_image_with_percentage
 
 from better_overview_GUI.GUI_2 import ImageViewer
 from visualize.GUI_for_main import GUI
+from visualize.GUI_for_add_centroids import GUI_Centroid
 
 from object_classification import train_modell
 
@@ -54,13 +55,15 @@ def main(match_image, DOWNLOAD= False):
   centroid_image = draw_centroids_on_image(centroids, match_image)
   part_image_and_percentage = save_all_part_image_with_percentage(centroids, match_image)
 
+  #One_GUI = GUI_Centroid(centroids,match_image,centroid_image)
+
   centroids, staebe_img = custome_line_detection(centroids, match_image)
   centroids = check_staebe(centroids)
   centroids = check_directions(centroids)
 
 
   connection_map, connection_img = connect_centroids(centroids, match_image)
-  return centroid_image, connection_img, centroids, part_image_and_percentage
+  return centroid_image, staebe_img, centroids, part_image_and_percentage
   #app = QApplication(sys.argv)
   #viewer = ImageViewer(centroids, match_image_url)
   #viewer.load_images([centroid_image,staebe_img])
@@ -91,7 +94,7 @@ def test_mode():
 
 def download_all_part_images():
   images_dir = sorted(os.listdir('content/raw_images'))
-  for image in images_dir:
+  for image in images_dir[:6]:
     match_image_url = f'content/raw_images/{image}'
     #match_image = cv2.cvtColor(mask_image(cv2.imread(match_image_url)), cv2.COLOR_GRAY2BGR)
     match_image = cv2.imread(match_image_url)
@@ -100,7 +103,7 @@ def download_all_part_images():
 
 def open_GUI():
   images_dir = sorted(os.listdir('content/raw_images'))
-  match_image_url = f'content/raw_images/{images_dir[0]}'
+  match_image_url = f'content/raw_images/{images_dir[1]}'
   match_image = cv2.imread(match_image_url)
 
   app = QApplication(sys.argv)

@@ -9,13 +9,13 @@ import numpy as np
 import os
 
 def split_data(image_height, image_width):
-  batch_size = 7
+  batch_size = 10
 
   train_datagen = ImageDataGenerator(
     rescale=1.0/255.0,  # Rescale pixel values to [0, 1]
-    rotation_range=20,  # Randomly rotate images
-    width_shift_range=0.2,  # Randomly shift images horizontally
-    height_shift_range=0.2,  # Randomly shift images vertically
+    rotation_range=40,  # Randomly rotate images
+    width_shift_range=0.3,  # Randomly shift images horizontally
+    height_shift_range=0.3,  # Randomly shift images vertically
     shear_range=0.2,  # Shear transformation
     zoom_range=0.2,  # Random zoom
     horizontal_flip=True,  # Randomly flip images horizontally
@@ -58,24 +58,29 @@ def define_neural_net(image_height, image_width, num_classes):
   return model
 
 def train_modell():
-  num_epochs = 50  # Adjust the number of epochs as needed
+  num_epochs = 100  # Adjust the number of epochs as needed
   image_height, image_width = 120, 120
 
   train_generator, validation_generator = split_data(image_height, image_width)# Ist in get Imgae in part defined
   model = define_neural_net(image_height, image_width, len(train_generator.class_indices))
 
   history = model.fit(train_generator, epochs=num_epochs, validation_data=validation_generator, )
-  model.save('content/models/model_5.h5')
-  print('---------- model_4 --------')
+  model_gen = len(os.listdir('content/models')) + 2
+  model.save(f'content/models/model_{model_gen}.h5')
+  print(f'---------- model_{model_gen} --------')
   print("Training accuracy:", history.history['accuracy'])
   print("Validation accuracy:", history.history['val_accuracy'])
   print("Training loss:", history.history['loss'])
   print("Validation loss:", history.history['val_loss'])
   print('---------- saved_model: -------')
 
+def c_load_modell():
+  model_gen = len(os.listdir('content/models')) + 1
+  loaded_model = load_model(f'content/models/model_{model_gen}.h5')
+  return loaded_model
 
-def predict_on_data(img):
-  loaded_model = load_model('content/models/model_5.h5')
+
+def predict_on_data(img, loaded_model):
   img = img / 255.0       # Normalize
   img = np.expand_dims(img, axis=0)    # Add a batch dimension to the input image
   predictions = loaded_model.predict(img)

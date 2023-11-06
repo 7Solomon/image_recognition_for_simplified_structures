@@ -28,7 +28,7 @@ def check_if_stab(line, match_image):
 
     line_values = np.array(line_values)
     if len(line_values) > 0:
-      max_intensities = np.max(line_values, axis=1)
+      max_intensities = np.max(line_values)
       max_indices = np.where(max_intensities == np.max(max_intensities))[0]
       if len(max_indices) > num_points/2:
         return True

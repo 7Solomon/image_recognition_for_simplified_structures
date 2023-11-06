@@ -12,8 +12,10 @@ from base_functions import is_in_range
 from base_functions import check_image_in_part
 from base_functions import show_image_in_size
 from base_functions import custom_sort
+from base_functions import mask_image
 
 from object_classification import predict_on_data
+from object_classification import c_load_modell
 
 from better_overview_GUI.GUI import ImageViewer
 
@@ -64,13 +66,13 @@ def check_centroid(centroid, match_image, DOWNLOAD=False):
 
   if DOWNLOAD:
     cv2.imwrite(f'label_programm/test_folder/{length}.png', part_image)
-
-  predictions = predict_on_data(part_image)
+  loaded_model = c_load_modell()
+  predictions = predict_on_data(part_image, loaded_model)
   switch_label = ['gelenk','festlager', 'loslager', 'b_ecke', 'n_gelenk']
   #for i, predic in enumerate(predictions[0]):
   #  print(f'Es ist mit  {predic*100} %  --> {switch_label[i]}')
   
-  if max(predictions[0]) > 0.3:
+  if max(predictions[0]) > 0.1:
     idx = np.argmax(predictions[0])
     if centroid[1] == idx:  
       centroid[1] = [centroid[1], predictions[0]]
@@ -84,6 +86,8 @@ def check_centroid(centroid, match_image, DOWNLOAD=False):
 
 
 def add_all_centroids(array, match_image, DOWNLOAD=False):
+  c_load_modell()
+
   all_centroids_array = []
   double = False
   for centroids in array:
@@ -184,15 +188,15 @@ def add_label(centroids, label):
 
 
 def custome_line_detection(centroids, match_image):
-  output_image = match_image.copy()
+  output_image = mask_image(match_image.copy())
   RASTER_A = 6             # Für Abstand des Blurs und neuwahl der Kords
   per_centroid_lines = []
   for i, centroid in enumerate(centroids):
-    array_up, array_down, array_left, array_right, border_image, part_image = get_borders_of_part_arround_point(centroid[0], match_image, RASTER_A)
-    new_kords_up, new_kords_down, new_kords_left, new_kords_right = border_check(centroid[0], part_image, array_up,array_down, array_left, array_right, RASTER_A, match_image)
-    lines = iterate_through_borders(new_kords_up, new_kords_down, new_kords_left, new_kords_right, match_image, RASTER_A)
+    array_up, array_down, array_left, array_right, border_image, part_image = get_borders_of_part_arround_point(centroid[0], output_image, RASTER_A)
+    new_kords_up, new_kords_down, new_kords_left, new_kords_right = border_check(centroid[0], part_image, array_up,array_down, array_left, array_right, RASTER_A, output_image)
+    lines = iterate_through_borders(new_kords_up, new_kords_down, new_kords_left, new_kords_right, output_image, RASTER_A)
     for line in lines:
-      if check_if_stab(line, match_image):
+      if check_if_stab(line, output_image):
         cv2.line(output_image, (int(line[0][0]), int(line[0][1])), (int(line[1][0]), int(line[1][1])), (0, 0, 255), 3)
         per_centroid_lines.append(line)
     centroids[i] = [centroid[0],centroid[1],per_centroid_lines]
@@ -335,7 +339,7 @@ def display_GUI(centroids, match_image):
 def sort_folder_for_data_pipeline():
   destination_path = 'test_1'
 
-  path_to_folders = ['label_programm/test_label']
+  path_to_folders = ['label_programm/test_label','content/data/train','content/data/validation']
   gelenke, festlager, loslager, biegesteife_ecke, normalkraft_gelenk = [], [], [], [], []
   hirarchy = [gelenke, festlager, loslager, biegesteife_ecke, normalkraft_gelenk]
 
